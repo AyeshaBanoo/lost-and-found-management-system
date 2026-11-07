@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Admin Dashboard</h1>
+{% include "partials/admin_nav.html" with context %}
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="num">{{ stats.total_lost }}</div><div class="label">Total Lost Items</div></div>
+  <div class="stat-card"><div class="num">{{ stats.total_found }}</div><div class="label">Total Found Items</div></div>
+  <div class="stat-card"><div class="num">{{ stats.potential_matches }}</div><div class="label">Potential Matches</div></div>
+  <div class="stat-card"><div class="num">{{ stats.pending_claims }}</div><div class="label">Pending Claims</div></div>
+  <div class="stat-card"><div class="num">{{ stats.approved_claims }}</div><div class="label">Approved Claims</div></div>
+  <div class="stat-card"><div class="num">{{ stats.rejected_claims }}</div><div class="label">Rejected Claims</div></div>
+  <div class="stat-card"><div class="num">{{ stats.returned }}</div><div class="label">Items Returned</div></div>
+  <div class="stat-card"><div class="num">{{ stats.flagged }}</div><div class="label">Suspicious Reports</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Recent Claims</div>
+  {% if recent_claims %}
+    <div class="table-wrap card">
+      <table>
+        <thead><tr><th>#</th><th>Found Item</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
+        <tbody>
+        {% for c in recent_claims %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.found_item_name }}</td>
+            <td><span class="tag tag-status">{{ c.status }}</span></td>
+            <td>{{ c.created_at }}</td>
+            <td><a href="{{ url_for('admin.claim_detail', claim_id=c.id) }}" class="btn btn-outline btn-sm">Review</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">No claims yet.</p>
+  {% endif %}
+</div>
+
+<p><a href="{{ url_for('admin.analytics') }}" class="btn btn-primary">View Full Analytics &amp; Charts</a></p>
+{% endblock %}

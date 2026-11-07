@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin — Reports{% endblock %}
+{% block content %}
+<h1>Manage Reports</h1>
+{% include "partials/admin_nav.html" with context %}
+
+<div class="section">
+  <div class="section-title">Lost Item Reports</div>
+  <div class="table-wrap card">
+    <table>
+      <thead><tr><th>Item</th><th>Owner</th><th>Location</th><th>Status</th><th>Flagged</th><th></th></tr></thead>
+      <tbody>
+      {% for item in lost %}
+        <tr>
+          <td><a href="{{ url_for('items.item_detail', item_type='lost', item_id=item.id) }}">{{ item.item_name }}</a></td>
+          <td>{{ item.owner_name }}<br><span class="muted" style="font-size:0.8em;">{{ item.owner_email }}</span></td>
+          <td>{{ item.city }}, {{ item.state }}</td>
+          <td><span class="tag tag-status">{{ item.status }}</span></td>
+          <td>{{ '🚩' if item.is_flagged else '—' }}</td>
+          <td style="white-space:nowrap;">
+            <form method="post" action="{{ url_for('admin.flag_report', item_type='lost', item_id=item.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-outline btn-sm">{{ 'Unflag' if item.is_flagged else 'Flag' }}</button>
+            </form>
+            <form method="post" action="{{ url_for('admin.remove_report', item_type='lost', item_id=item.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this report from public listings?');">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Found Item Reports</div>
+  <div class="table-wrap card">
+    <table>
+      <thead><tr><th>Item</th><th>Finder</th><th>Location</th><th>Status</th><th>Flagged</th><th></th></tr></thead>
+      <tbody>
+      {% for item in found %}
+        <tr>
+          <td><a href="{{ url_for('items.item_detail', item_type='found', item_id=item.id) }}">{{ item.item_name }}</a></td>
+          <td>{{ item.finder_name }}<br><span class="muted" style="font-size:0.8em;">{{ item.finder_email }}</span></td>
+          <td>{{ item.city }}, {{ item.state }}</td>
+          <td><span class="tag tag-status">{{ item.status }}</span></td>
+          <td>{{ '🚩' if item.is_flagged else '—' }}</td>
+          <td style="white-space:nowrap;">
+            <form method="post" action="{{ url_for('admin.flag_report', item_type='found', item_id=item.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-outline btn-sm">{{ 'Unflag' if item.is_flagged else 'Flag' }}</button>
+            </form>
+            <form method="post" action="{{ url_for('admin.remove_report', item_type='found', item_id=item.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this report from public listings?');">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}My Profile — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>My Profile</h1>
+<div class="card" style="max-width:480px;">
+  <dl class="kv">
+    <dt>Name</dt><dd>{{ current_user.name }}</dd>
+    <dt>Email</dt><dd>{{ current_user.email }}</dd>
+    <dt>Phone</dt><dd>{{ current_user.phone or '—' }}</dd>
+    <dt>Role</dt><dd>{{ current_user.role }}</dd>
+    <dt>Member since</dt><dd>{{ current_user.created_at }}</dd>
+  </dl>
+</div>
+
+<div class="stats-grid" style="margin-top:24px;">
+  <div class="stat-card"><div class="num">{{ my_lost|length }}</div><div class="label">Lost Reports</div></div>
+  <div class="stat-card"><div class="num">{{ my_found|length }}</div><div class="label">Found Reports</div></div>
+</div>
+
+<p style="margin-top:20px;"><a href="{{ url_for('items.my_reports') }}" class="btn btn-outline">View All My Reports</a></p>
+{% endblock %}

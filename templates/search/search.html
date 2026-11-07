@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Search — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Search Lost &amp; Found</h1>
+<p class="muted">Search by keywords (semantic — "earphones" also finds "wireless earbuds"), upload a photo
+  of a similar item, or narrow down with filters.</p>
+
+<form method="post" enctype="multipart/form-data" class="filters-bar">
+  <div class="field" style="flex:2;">
+    <label for="q">Search text</label>
+    <input type="text" id="q" name="q" placeholder="e.g. black wallet lost in Mangaluru" value="{{ query }}">
+  </div>
+  <div class="field">
+    <label for="scope">Scope</label>
+    <select id="scope" name="scope">
+      <option value="both" {{ 'selected' if scope=='both' }}>Lost &amp; Found</option>
+      <option value="lost" {{ 'selected' if scope=='lost' }}>Lost only</option>
+      <option value="found" {{ 'selected' if scope=='found' }}>Found only</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="category">Category</label>
+    <select id="category" name="category">
+      <option value="">Any</option>
+      {% for c in categories %}<option value="{{ c }}" {{ 'selected' if filters.category==c }}>{{ c }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="state">State</label>
+    <select id="state" name="state">
+      <option value="">Any</option>
+      {% for s in states %}<option value="{{ s }}" {{ 'selected' if filters.state==s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="image">Or search by photo</label>
+    <input type="file" id="image" name="image" accept="image/*">
+  </div>
+  <div class="field" style="flex:0;">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+</form>
+
+{% if used_image_search %}
+  <div class="section-title">Visual Matches <span class="muted">— ranked by image similarity</span></div>
+  {% if image_results %}
+    <div class="item-grid">
+      {% for item, score in image_results %}
+        {% with item_type = ('date_lost' in item.keys()) and 'lost' or 'found', score_badge = score ~ '% visual match' %}
+          {% include "partials/item_card.html" %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No visually similar items found yet.</p>
+  {% endif %}
+{% else %}
+  <div class="section-title">Results <span class="muted">({{ text_results|length }} found)</span></div>
+  {% if text_results %}
+    <div class="item-grid">
+      {% for item, score in text_results %}
+        {% with item_type = ('date_lost' in item.keys()) and 'lost' or 'found',
+                score_badge = (score ~ '% text match') if score is not none else none %}
+          {% include "partials/item_card.html" %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No matching reports found. Try different keywords or fewer filters.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

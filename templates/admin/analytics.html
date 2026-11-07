@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Admin — Analytics{% endblock %}
+{% block content %}
+<h1>Platform Analytics</h1>
+{% include "partials/admin_nav.html" with context %}
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <h3 class="mt-0">Items by Category</h3>
+    <canvas id="categoryChart" height="220"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3 class="mt-0">Items by State</h3>
+    <canvas id="stateChart" height="220"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3 class="mt-0">AI Matches by Confidence Level</h3>
+    <canvas id="confidenceChart" height="220"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3 class="mt-0">Lost vs Found vs Returned</h3>
+    <canvas id="funnelChart" height="220"></canvas>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+fetch("{{ url_for('admin.analytics_data') }}")
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    var palette = ["#2454ff", "#12875a", "#c8401f", "#a9720b", "#7c3aed", "#0891b2", "#db2777", "#65a30d"];
+Chart.defaults.color = window.__theme === "dark" ? "#cfc8ee" : "#5a6f77";
+    new Chart(document.getElementById("categoryChart"), {
+      type: "bar",
+      data: {
+        labels: data.by_category.map(function (d) { return d.category; }),
+        datasets: [{ label: "Reports", data: data.by_category.map(function (d) { return d.c; }), backgroundColor: "#2454ff" }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById("stateChart"), {
+      type: "bar",
+      data: {
+        labels: data.by_state.map(function (d) { return d.state; }),
+        datasets: [{ label: "Reports", data: data.by_state.map(function (d) { return d.c; }), backgroundColor: "#12875a" }]
+      },
+      options: { indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById("confidenceChart"), {
+      type: "doughnut",
+      data: {
+        labels: data.by_confidence.map(function (d) { return d.confidence; }),
+        datasets: [{ data: data.by_confidence.map(function (d) { return d.c; }), backgroundColor: palette }]
+      }
+    });
+
+    new Chart(document.getElementById("funnelChart"), {
+      type: "bar",
+      data: {
+        labels: ["Lost Reports", "Found Reports", "Returned"],
+        datasets: [{
+          label: "Count",
+          data: [data.funnel.lost, data.funnel.found, data.funnel.returned],
+          backgroundColor: ["#c8401f", "#2454ff", "#12875a"]
+        }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  });
+</script>
+{% endblock %}

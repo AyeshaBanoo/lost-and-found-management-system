@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Admin — Users{% endblock %}
+{% block content %}
+<h1>Users</h1>
+{% include "partials/admin_nav.html" with context %}
+
+<div class="table-wrap card">
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th></th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.phone or '—' }}</td>
+        <td>{{ u.role }}</td>
+        <td>{% if u.is_blocked %}<span class="tag" style="background:#fbe7e5;color:#b3261e;">Suspended</span>{% else %}<span class="tag tag-high">Active</span>{% endif %}</td>
+        <td>{{ u.created_at }}</td>
+        <td>
+          {% if u.role != 'admin' %}
+            <form method="post" action="{{ url_for('admin.toggle_block', user_id=u.id) }}">
+              <button type="submit" class="btn btn-outline btn-sm" onclick="return confirm('Change this user\'s status?');">
+                {{ 'Unblock' if u.is_blocked else 'Suspend' }}
+              </button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

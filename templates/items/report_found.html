@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Report Found Item — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Report a Found Item</h1>
+<p class="muted">Thank you for helping reunite an item with its owner. Please avoid sharing your personal
+  contact details publicly — the platform handles claims and verification for you.</p>
+
+<div class="notice-box warn">
+  If this is a valuable or sensitive item (phone, wallet, ID documents, jewellery), please also consider
+  handing it to the nearest authority — police, railway/airport desk, or the establishment where you
+  found it — instead of arranging a private handover.
+</div>
+
+<form method="post" enctype="multipart/form-data" class="card">
+  <div class="form-grid">
+    <div class="field">
+      <label for="item_name">Item Name *</label>
+      <input type="text" id="item_name" name="item_name" placeholder="e.g. Black JBL Bluetooth earphones" required value="{{ form.get('item_name','') }}">
+    </div>
+    <div class="field">
+      <label for="category">Category *</label>
+      <select id="category" name="category" required>
+        <option value="">Select category</option>
+        {% for c in categories %}
+          <option value="{{ c }}" {{ 'selected' if form.get('category')==c }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field full">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Where and how you found it">{{ form.get('description','') }}</textarea>
+    </div>
+    <div class="field">
+      <label for="brand">Brand</label>
+      <input type="text" id="brand" name="brand" value="{{ form.get('brand','') }}">
+    </div>
+    <div class="field">
+      <label for="model">Model</label>
+      <input type="text" id="model" name="model" value="{{ form.get('model','') }}">
+    </div>
+    <div class="field">
+      <label for="colour">Colour</label>
+      <input type="text" id="colour" name="colour" value="{{ form.get('colour','') }}">
+    </div>
+    <div class="field">
+      <label for="image">Photo</label>
+      <input type="file" id="image" name="image" accept="image/*" data-image-preview="foundPreview">
+      <img id="foundPreview" style="display:none;max-width:140px;border-radius:8px;margin-top:8px;">
+    </div>
+
+    <div class="field full autocomplete-wrap">
+      <label for="location_search">Location *</label>
+      <input type="text" id="location_search" placeholder="Type a city, area, or landmark anywhere in India..." autocomplete="off" data-location-autocomplete required>
+      <div id="location_suggestions" class="autocomplete-list" style="display:none;"></div>
+      <input type="hidden" id="state" name="state" value="{{ form.get('state','') }}">
+      <input type="hidden" id="district" name="district" value="{{ form.get('district','') }}">
+      <input type="hidden" id="city" name="city" value="{{ form.get('city','') }}">
+      <input type="hidden" id="area" name="area" value="{{ form.get('area','') }}">
+      <input type="hidden" id="latitude" name="latitude" value="{{ form.get('latitude','') }}">
+      <input type="hidden" id="longitude" name="longitude" value="{{ form.get('longitude','') }}">
+      <p class="hint">Start typing and pick a suggestion from the dropdown — covers every state, district and city in India.</p>
+    </div>
+    <div class="field">
+      <label for="date_found">Date Found *</label>
+      <input type="date" id="date_found" name="date_found" required value="{{ form.get('date_found','') }}">
+    </div>
+    <div class="field">
+      <label for="time_found">Approximate Time</label>
+      <input type="time" id="time_found" name="time_found" value="{{ form.get('time_found','') }}">
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-found btn-block">Submit Found Item Report</button>
+</form>
+{% endblock %}

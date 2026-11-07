@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Lost Items — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Lost Item Reports</h1>
+
+<form method="get" class="filters-bar">
+  <div class="field">
+    <label for="category">Category</label>
+    <select id="category" name="category">
+      <option value="">Any</option>
+      {% for c in categories %}<option value="{{ c }}" {{ 'selected' if filters.category==c }}>{{ c }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="state">State</label>
+    <select id="state" name="state">
+      <option value="">Any</option>
+      {% for s in states %}<option value="{{ s }}" {{ 'selected' if filters.state==s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field" style="flex:0;"><button type="submit" class="btn btn-primary">Filter</button></div>
+</form>
+
+{% if items %}
+  <div class="item-grid">
+    {% for item in items %}
+      {% with item_type = "lost" %}{% include "partials/item_card.html" %}{% endwith %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="empty-state">No lost item reports match these filters.</p>
+{% endif %}
+{% endblock %}

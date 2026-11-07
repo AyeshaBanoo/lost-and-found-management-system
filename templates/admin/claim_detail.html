@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Admin — Claim #{{ claim.id }}{% endblock %}
+{% block content %}
+<h1>Claim #{{ claim.id }}</h1>
+{% include "partials/admin_nav.html" with context %}
+
+<div class="two-col">
+  <div>
+    <div class="card">
+      <h3 class="mt-0">Claimant</h3>
+      <dl class="kv">
+        <dt>Name</dt><dd>{{ claim.claimant_name }}</dd>
+        <dt>Email</dt><dd>{{ claim.claimant_email }}</dd>
+        <dt>Claimed item</dt><dd>{{ claim.found_item_name }}</dd>
+        <dt>Their lost report</dt><dd>{{ claim.lost_item_name }}</dd>
+        {% if match %}
+          <dt>AI Match Score</dt><dd><strong>{{ (match.final_score*100)|round|int }}%</strong> ({{ match.confidence }} confidence)</dd>
+        {% endif %}
+        <dt>Evidence Match</dt><dd><strong>{{ (claim.evidence_score*100)|round|int }}%</strong> (avg. answer similarity)</dd>
+        <dt>Status</dt><dd><span class="tag tag-status">{{ claim.status }}</span></dd>
+      </dl>
+      {% if claim.proof_description %}
+        <hr class="divider">
+        <p><strong>Additional proof provided:</strong><br>{{ claim.proof_description }}</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h3 class="mt-0">Ownership Verification</h3>
+      {% if questions %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Question</th><th>Expected (private)</th><th>Claimant's Answer</th><th>Match</th></tr></thead>
+            <tbody>
+            {% for q in questions %}
+              <tr>
+                <td>{{ q.question }}</td>
+                <td>{{ q.expected_answer }}</td>
+                <td>{{ q.claimant_answer }}</td>
+                <td>
+                  {% if q.match_result >= 0.7 %}✓ {{ (q.match_result*100)|round|int }}%
+                  {% elif q.match_result >= 0.4 %}~ {{ (q.match_result*100)|round|int }}%
+                  {% else %}✗ {{ (q.match_result*100)|round|int }}%{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">No structured verification questions were available for this lost report.</p>
+      {% endif %}
+    </div>
+
+    {% if other_claims %}
+      <div class="card">
+        <h3 class="mt-0">⚠️ Other claims on this same found item</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Claimant</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for oc in other_claims %}
+              <tr><td>{{ oc.claimant_name }}</td><td><span class="tag tag-status">{{ oc.status }}</span></td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="hint">Multiple claims detected — compare evidence carefully before approving.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="card">
+      <h3 class="mt-0">Admin Decision</h3>
+      {% if claim.status in ['APPROVED', 'REJECTED'] %}
+        <p class="muted">This claim has already been reviewed{% if claim.reviewed_at %} on {{ claim.reviewed_at }}{% endif %}.</p>
+        {% if claim.admin_remarks %}<p><strong>Remarks:</strong> {{ claim.admin_remarks }}</p>{% endif %}
+        {% if claim.status == 'APPROVED' %}
+          <form method="post" action="{{ url_for('admin.complete_handover', claim_id=claim.id) }}">
+            <button type="submit" class="btn btn-found btn-block" onclick="return confirm('Confirm the item has been safely handed over?');">Mark Handover Completed</button>
+          </form>
+        {% endif %}
+      {% else %}
+        <form method="post" action="{{ url_for('admin.decide_claim', claim_id=claim.id) }}">
+          <div class="field">
+            <label for="remarks">Remarks (shown to claimant)</label>
+            <textarea id="remarks" name="remarks" placeholder="Optional notes"></textarea>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button type="submit" name="decision" value="approve" class="btn btn-found">Approve</button>
+            <button type="submit" name="decision" value="reject" class="btn btn-danger">Reject</button>
+            <button type="submit" name="decision" value="more_evidence" class="btn btn-outline">Request More Evidence</button>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="notice-box">
+      Approving confirms the claimant's evidence was verified by a human. It does not itself complete the
+      handover — use "Mark Handover Completed" once the item has actually been returned.
+    </div>
+  </div>
+</div>
+{% endblock %}

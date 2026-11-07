@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Potential Matches — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Potential Matches for "{{ lost_item.item_name }}"</h1>
+<div class="notice-box">
+  This is an AI-generated potential match, not proof of ownership. Submit a claim so a human admin can
+  verify ownership using your private details.
+</div>
+
+{% if matches %}
+  {% for match, checks in matches %}
+    <div class="match-card">
+      {% if match.image_path %}
+        <img src="{{ url_for('static', filename=match.image_path) }}" alt="{{ match.item_name }}">
+      {% else %}
+        <div class="match-thumb-placeholder">📦</div>
+      {% endif %}
+      <div>
+        <a class="item-title" href="{{ url_for('items.item_detail', item_type='found', item_id=match.found_item_id) }}">{{ match.item_name }}</a>
+        <div class="item-meta">{{ match.category }} · {{ match.colour or '—' }} · {{ match.city }}, {{ match.state }}</div>
+        <div class="item-meta">Found on {{ match.date_found }} · Status: {{ match.found_status }}</div>
+        <ul class="check-list">
+          {% for label, ok in checks %}<li>✓ {{ label }}</li>{% endfor %}
+        </ul>
+        <div class="item-meta" style="margin-top:6px;">
+          Text {{ (match.text_score*100)|round|int }}% ·
+          Image {{ (match.image_score*100)|round|int if match.image_score else 'N/A' }}{{ '%' if match.image_score }} ·
+          Location {{ (match.location_score*100)|round|int }}% ·
+          Date {{ (match.date_score*100)|round|int }}%
+        </div>
+      </div>
+      <div class="match-score">
+        <div class="score-ring">{{ (match.final_score*100)|round|int }}%</div>
+        <span class="tag tag-{{ match.confidence|lower }}">{{ match.confidence }} Confidence</span>
+        <br><br>
+        {% if match.found_status == 'FOUND' %}
+          <a href="{{ url_for('matches.submit_claim', found_item_id=match.found_item_id, lost_item_id=lost_item.id) }}" class="btn btn-primary btn-sm">Submit Claim</a>
+        {% else %}
+          <span class="tag tag-status">{{ match.found_status }}</span>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="empty-state">No potential matches yet. We'll notify you as soon as a found-item report is a good match.</p>
+{% endif %}
+{% endblock %}

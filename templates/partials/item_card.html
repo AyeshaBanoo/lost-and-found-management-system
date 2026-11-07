@@ -1,0 +1,19 @@
+<div class="item-card">
+  <a href="{{ url_for('items.item_detail', item_type=item_type, item_id=item.id) }}">
+    {% if item.image_path %}
+      <img class="item-thumb" src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.item_name }}">
+    {% else %}
+      <div class="item-thumb-placeholder">📦</div>
+    {% endif %}
+  </a>
+  <div class="item-body">
+    <span class="tag {{ 'tag-lost' if item_type == 'lost' else 'tag-found' }}">{{ item_type }}</span>
+    <a class="item-title" href="{{ url_for('items.item_detail', item_type=item_type, item_id=item.id) }}">{{ item.item_name }}</a>
+    <div class="item-meta">{{ item.category }} · {{ item.colour or '—' }}</div>
+    <div class="item-meta">{{ item.city or item.district or item.state or 'Location unknown' }}</div>
+    <div class="item-meta">Status: {{ item.status }}</div>
+    {% if score_badge is defined and score_badge is not none %}
+      <span class="tag tag-medium">{{ score_badge }}</span>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — Lost and Found Application{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card">
+    <h1>Create your account</h1>
+    <p class="muted">Join the platform to report and search lost &amp; found items across India.</p>
+    <form method="post">
+      <div class="field">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" value="{{ form.get('name','') }}" required autofocus>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ form.get('email','') }}" required>
+      </div>
+      <div class="field">
+        <label for="phone">Phone (optional)</label>
+        <input type="tel" id="phone" name="phone" value="{{ form.get('phone','') }}">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required minlength="6">
+      </div>
+      <div class="field">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+    </form>
+    <hr class="divider">
+    <p class="text-center muted">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

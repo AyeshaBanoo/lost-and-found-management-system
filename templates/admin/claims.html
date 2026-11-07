@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin — Claims{% endblock %}
+{% block content %}
+<h1>Claim Review</h1>
+{% include "partials/admin_nav.html" with context %}
+
+{% if grouped %}
+  {% for found_id, group in grouped.items() %}
+    <div class="card" style="margin-bottom:16px;">
+      <h3 class="mt-0">{{ group.item_name }}
+        {% if group.claims|length > 1 %}
+          <span class="tag tag-medium">Multiple claims — review required</span>
+        {% endif %}
+      </h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Claimant</th><th>Evidence Match</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
+          <tbody>
+          {% for c in group.claims %}
+            <tr>
+              <td>{{ c.claimant_name }}<br><span class="muted" style="font-size:0.8em;">{{ c.claimant_email }}</span></td>
+              <td>{{ (c.evidence_score*100)|round|int }}%</td>
+              <td><span class="tag tag-status">{{ c.status }}</span></td>
+              <td>{{ c.created_at }}</td>
+              <td><a href="{{ url_for('admin.claim_detail', claim_id=c.id) }}" class="btn btn-primary btn-sm">Review</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="empty-state">No claims submitted yet.</p>
+{% endif %}
+{% endblock %}

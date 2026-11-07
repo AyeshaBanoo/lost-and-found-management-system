@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}My Claims — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>My Claims</h1>
+
+{% if claims %}
+  <div class="table-wrap card">
+    <table>
+      <thead><tr><th>Found Item</th><th>My Lost Report</th><th>Submitted</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for claim in claims %}
+        <tr>
+          <td>{{ claim.found_item_name }}</td>
+          <td>{{ claim.lost_item_name }}</td>
+          <td>{{ claim.created_at }}</td>
+          <td><span class="tag tag-status">{{ claim.status }}</span></td>
+          <td><a href="{{ url_for('matches.claim_status', claim_id=claim.id) }}" class="btn btn-outline btn-sm">View</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="empty-state">You haven't submitted any claims yet.</p>
+{% endif %}
+{% endblock %}

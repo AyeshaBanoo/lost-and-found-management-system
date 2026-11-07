@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Databases and private instance data
+instance/
+*.sqlite
+*.sqlite3
+*.db
+
+# User-uploaded files
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Logs
+*.log

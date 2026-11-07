@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ item.item_name }} — Lost and Found Application{% endblock %}
+{% block content %}
+
+<div class="two-col">
+  <div>
+    {% if item.image_path %}
+      <img src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.item_name }}" style="width:100%;border-radius:14px;max-height:420px;object-fit:cover;">
+    {% else %}
+      <div class="item-thumb-placeholder" style="height:280px;border-radius:14px;">📦</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <span class="tag {{ 'tag-lost' if item_type=='lost' else 'tag-found' }}">{{ item_type }}</span>
+    <h1 class="mt-0">{{ item.item_name }}</h1>
+    <dl class="kv">
+      <dt>Category</dt><dd>{{ item.category }}</dd>
+      <dt>Brand / Model</dt><dd>{{ item.brand or '—' }} {{ item.model or '' }}</dd>
+      <dt>Colour</dt><dd>{{ item.colour or '—' }}</dd>
+      <dt>Location</dt><dd>{{ item.area }}{% if item.area %}, {% endif %}{{ item.city }}, {{ item.district }}, {{ item.state }}</dd>
+      {% if item_type == 'lost' %}
+        <dt>Date Lost</dt><dd>{{ item.date_lost }} {{ item.time_lost or '' }}</dd>
+        <dt>Reported by</dt><dd>{{ item.owner_name if is_owner or (current_user and current_user.role=='admin') else 'Hidden for privacy' }}</dd>
+      {% else %}
+        <dt>Date Found</dt><dd>{{ item.date_found }} {{ item.time_found or '' }}</dd>
+        <dt>Reported by</dt><dd>{{ item.finder_name if is_owner or (current_user and current_user.role=='admin') else 'Hidden for privacy' }}</dd>
+      {% endif %}
+      <dt>Status</dt><dd>{{ item.status }}</dd>
+    </dl>
+
+    {% if item.description %}
+      <hr class="divider">
+      <p>{{ item.description }}</p>
+    {% endif %}
+
+    <hr class="divider">
+    {% if item_type == 'lost' %}
+      {% if is_owner %}
+        <a href="{{ url_for('matches.view_matches', lost_item_id=item.id) }}" class="btn btn-primary btn-block">View AI Matches</a>
+      {% endif %}
+    {% else %}
+      {% if current_user %}
+        {% if not is_owner %}
+          <a href="{{ url_for('matches.submit_claim', found_item_id=item.id) }}" class="btn btn-primary btn-block">This is mine — Submit a Claim</a>
+        {% endif %}
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-block">Log in to submit a claim</a>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+{% if item_type == 'found' and is_owner and approved_claim %}
+  <div class="card" style="margin-top:20px;">
+    <h3 class="mt-0">Claim Approved — Arrange Handover</h3>
+    {% if is_high_value %}
+      <div class="notice-box warn">
+        This is a high-value or sensitive category item. Please don't hand it over privately — give it to
+        the police, transport authority, or establishment desk, and share that location with the claimant.
+      </div>
+    {% else %}
+      <div class="notice-box">
+        An admin verified a claim on this item. You can now contact the claimant to return it at a safe,
+        public place.
+      </div>
+    {% endif %}
+    <dl class="kv">
+      <dt>Claimant</dt><dd>{{ approved_claim.claimant_name }}</dd>
+      <dt>Phone</dt><dd>{{ approved_claim.claimant_phone or 'Not provided' }}</dd>
+      <dt>Email</dt><dd>{{ approved_claim.claimant_email }}</dd>
+    </dl>
+    <p class="hint">This contact is visible only to you, and only because the claim was verified and approved.</p>
+  </div>
+{% endif %}
+
+<div class="notice-box" style="margin-top:24px;">
+  This listing shows only public information. Any private ownership details supplied when the lost
+  report was filed are kept confidential and used solely for claim verification.
+</div>
+
+{% endblock %}

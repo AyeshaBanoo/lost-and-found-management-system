@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Notifications — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Notifications</h1>
+{% if notifications %}
+  <div class="card">
+    {% for n in notifications %}
+      <div style="padding:12px 0;{{ 'border-bottom:1px solid var(--line);' if not loop.last }}">
+        <div>{{ n.message }}</div>
+        <div class="item-meta">{{ n.created_at }} {% if n.link %}· <a href="{{ n.link }}">View</a>{% endif %}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="empty-state">You have no notifications yet.</p>
+{% endif %}
+{% endblock %}

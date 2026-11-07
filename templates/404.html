@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Not Found — Lost and Found Application{% endblock %}
+{% block content %}
+<div class="empty-state">
+  <h1>404</h1>
+  <p>That page doesn't exist. <a href="{{ url_for('main.home') }}">Go home</a></p>
+</div>
+{% endblock %}

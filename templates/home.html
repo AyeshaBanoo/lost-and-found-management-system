@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Lost and Found Application — Find what you lost{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <h1>Lost something? Found something?<br>Help it get back to its owner.</h1>
+  <p class="lead">A pan-India platform where people report lost and found items, and AI helps surface
+     likely matches using text, images, location, category and time — while humans always make the
+     final ownership call.</p>
+  <div class="hero-actions">
+    <a href="{{ url_for('items.report_lost') }}" class="btn btn-lost">Report Lost Item</a>
+    <a href="{{ url_for('items.report_found') }}" class="btn btn-found">Report Found Item</a>
+    <a href="{{ url_for('search.search') }}" class="btn btn-outline">Search Lost &amp; Found</a>
+  </div>
+</section>
+
+<div class="notice-box">
+  <strong>Please note:</strong> this platform is a community-assisted discovery and matching service.
+  AI-generated matches are suggestions only and do not prove ownership. For stolen items, identity
+  documents, high-value property, or suspected criminal activity, please contact the appropriate police,
+  government, transport, or establishment authorities. For lost/stolen mobile phones, use the Government
+  of India's <a href="https://www.ceir.gov.in" target="_blank" rel="noopener">Sanchar Saathi / CEIR</a> service.
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="num">{{ stats.lost }}</div><div class="label">Lost Reports</div></div>
+  <div class="stat-card"><div class="num">{{ stats.found }}</div><div class="label">Found Reports</div></div>
+  <div class="stat-card"><div class="num">{{ stats.matches }}</div><div class="label">AI Matches Made</div></div>
+  <div class="stat-card"><div class="num">{{ stats.returned }}</div><div class="label">Items Returned</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">How it works</div>
+  <ul class="step-list">
+    <li><strong>Report</strong><p class="muted">File a lost or found report with description, category, location and a photo.</p></li>
+    <li><strong>AI Matches</strong><p class="muted">Text, image, location, category and date signals are combined into a match score.</p></li>
+    <li><strong>Claim</strong><p class="muted">The likely owner answers private verification questions only they should know.</p></li>
+    <li><strong>Human Review</strong><p class="muted">An admin checks the evidence and approves — AI never decides ownership alone.</p></li>
+    <li><strong>Safe Handover</strong><p class="muted">Item is returned via a safe public handover or an authorized desk/authority.</p></li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-title">Recently Reported <span class="muted">— across supported Indian states</span></div>
+  <div class="item-grid">
+    {% for item in recent_lost %}
+      {% with item_type = "lost" %}{% include "partials/item_card.html" %}{% endwith %}
+    {% endfor %}
+    {% for item in recent_found %}
+      {% with item_type = "found" %}{% include "partials/item_card.html" %}{% endwith %}
+    {% endfor %}
+    {% if not recent_lost and not recent_found %}
+      <p class="muted">No reports yet — be the first to report a lost or found item.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Supported Locations Across India</div>
+  <p class="muted">{{ states | join(', ') }} — and more districts/cities can be added easily as the platform grows.</p>
+</div>
+
+{% endblock %}

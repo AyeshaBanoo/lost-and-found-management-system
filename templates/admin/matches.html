@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Admin — Matches{% endblock %}
+{% block content %}
+<h1>AI Matches</h1>
+{% include "partials/admin_nav.html" with context %}
+
+<div class="table-wrap card">
+  <table>
+    <thead><tr><th>Lost Item</th><th>Found Item</th><th>Text</th><th>Image</th><th>Category</th><th>Location</th><th>Date</th><th>Overall</th><th>Confidence</th></tr></thead>
+    <tbody>
+    {% for m in matches %}
+      <tr>
+        <td>{{ m.lost_name }}</td>
+        <td>{{ m.found_name }}</td>
+        <td>{{ (m.text_score*100)|round|int }}%</td>
+        <td>{{ (m.image_score*100)|round|int }}%</td>
+        <td>{{ (m.category_score*100)|round|int }}%</td>
+        <td>{{ (m.location_score*100)|round|int }}%</td>
+        <td>{{ (m.date_score*100)|round|int }}%</td>
+        <td><strong>{{ (m.final_score*100)|round|int }}%</strong></td>
+        <td><span class="tag tag-{{ m.confidence|lower }}">{{ m.confidence }}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

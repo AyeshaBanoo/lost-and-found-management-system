@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Submit a Claim — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Submit a Claim for "{{ found_item.item_name }}"</h1>
+<div class="notice-box">
+  Your answers below are compared privately against the details you gave when you filed your lost report.
+  They are never shown publicly, and the AI match score alone does not grant ownership — a human admin
+  makes the final decision.
+</div>
+
+<form method="get" class="card" style="margin-bottom:16px;">
+  <div class="field">
+    <label for="lost_item_id">Which of your lost reports is this?</label>
+    <select id="lost_item_id" name="lost_item_id" onchange="this.form.submit()">
+      <option value="">Select your lost item report</option>
+      {% for li in my_lost_items %}
+        <option value="{{ li.id }}" {{ 'selected' if lost_item and lost_item.id==li.id }}>
+          {{ li.item_name }} ({{ li.category }}, lost {{ li.date_lost }})
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+
+{% if lost_item %}
+  <form method="post" class="card">
+    <input type="hidden" name="lost_item_id" value="{{ lost_item.id }}">
+
+    <fieldset>
+      <legend>Verification Questions</legend>
+      {% if questions %}
+        {% for question, expected in questions %}
+          <div class="field">
+            <label for="answer_{{ loop.index0 }}">{{ question }}</label>
+            <input type="text" id="answer_{{ loop.index0 }}" name="answer_{{ loop.index0 }}" required>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">You didn't add private ownership details to this lost report, so there are no
+          verification questions. The admin will review your claim based on the description you provide below.</p>
+      {% endif %}
+    </fieldset>
+
+    <div class="field">
+      <label for="proof_description">Anything else that proves this is yours?</label>
+      <textarea id="proof_description" name="proof_description" placeholder="Any additional proof of ownership"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">Submit Claim</button>
+  </form>
+{% endif %}
+{% endblock %}

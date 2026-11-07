@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Claim Status — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>Claim #{{ claim.id }}</h1>
+
+<div class="card">
+  <dl class="kv">
+    <dt>Claimed item</dt><dd>{{ claim.found_item_name }}</dd>
+    <dt>Your lost report</dt><dd>{{ claim.lost_item_name }}</dd>
+    <dt>Submitted</dt><dd>{{ claim.created_at }}</dd>
+    <dt>Status</dt>
+    <dd>
+      {% if claim.status == 'APPROVED' %}
+        <span class="tag tag-high">APPROVED</span>
+      {% elif claim.status == 'REJECTED' %}
+        <span class="tag" style="background:#fbe7e5;color:#b3261e;">REJECTED</span>
+      {% elif claim.status == 'MORE_EVIDENCE' %}
+        <span class="tag tag-medium">MORE EVIDENCE NEEDED</span>
+      {% else %}
+        <span class="tag tag-status">UNDER REVIEW</span>
+      {% endif %}
+    </dd>
+    {% if claim.admin_remarks %}
+      <dt>Admin remarks</dt><dd>{{ claim.admin_remarks }}</dd>
+    {% endif %}
+  </dl>
+
+  {% if claim.status == 'PENDING' or claim.status == 'UNDER_REVIEW' %}
+    <p class="muted" style="margin-top:16px;">Claim submitted successfully. Your ownership evidence has been
+      submitted for verification. An admin will review it shortly.</p>
+  {% elif claim.status == 'REJECTED' %}
+    <p class="muted" style="margin-top:16px;">This claim was not approved. If you believe this is a mistake,
+      you can file a new claim from the item's match page with more detail.</p>
+  {% endif %}
+</div>
+
+{% if claim.status == 'APPROVED' %}
+  <div class="card" style="margin-top:16px;">
+    <h3 class="mt-0">Arrange Handover</h3>
+    {% if is_high_value %}
+      <div class="notice-box warn">
+        This is a high-value or sensitive category item. Please don't arrange a private meetup — collect
+        it through the police, transport authority, or establishment desk that is holding it. Use the
+        finder's contact below to confirm exactly where it's being kept.
+      </div>
+    {% else %}
+      <div class="notice-box">
+        Your claim has been approved! You can now contact the finder directly to arrange a safe, public
+        handover (e.g. a café, college gate, or a police station lobby).
+      </div>
+    {% endif %}
+    <dl class="kv">
+      <dt>Finder's name</dt><dd>{{ claim.finder_name }}</dd>
+      <dt>Phone</dt><dd>{{ claim.finder_phone or 'Not provided' }}</dd>
+      <dt>Email</dt><dd>{{ claim.finder_email }}</dd>
+    </dl>
+    <p class="hint">This contact was hidden until your claim was verified and approved. The item will be
+      marked <strong>RETURNED</strong> once an admin confirms handover is complete.</p>
+  </div>
+{% endif %}
+
+{% if claim.status == 'MORE_EVIDENCE' %}
+  <div class="card" style="margin-top:16px;">
+    <h3 class="mt-0">Provide More Evidence</h3>
+    <p class="muted">The admin needs a bit more to verify this is yours. Add or correct your answers below,
+      and/or describe any additional proof.</p>
+
+    <form method="post" action="{{ url_for('matches.add_more_evidence', claim_id=claim.id) }}">
+      {% if questions %}
+        <fieldset>
+          <legend>Verification Answers</legend>
+          {% for q in questions %}
+            <div class="field">
+              <label for="answer_{{ q.id }}">{{ q.question }}</label>
+              <input type="text" id="answer_{{ q.id }}" name="answer_{{ q.id }}"
+                     value="{{ q.claimant_answer or '' }}" placeholder="Update your answer if needed">
+            </div>
+          {% endfor %}
+        </fieldset>
+      {% endif %}
+      <div class="field">
+        <label for="additional_evidence">Additional evidence / details</label>
+        <textarea id="additional_evidence" name="additional_evidence"
+                  placeholder="e.g. purchase receipt details, extra distinguishing marks, photos you can describe"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Submit Additional Evidence</button>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}

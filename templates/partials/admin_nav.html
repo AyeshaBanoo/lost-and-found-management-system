@@ -1,0 +1,9 @@
+<div class="pill-nav">
+  <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if active=='dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('admin.reports') }}" class="{{ 'active' if active=='reports' }}">Reports</a>
+  <a href="{{ url_for('admin.matches') }}" class="{{ 'active' if active=='matches' }}">Matches</a>
+  <a href="{{ url_for('admin.claims') }}" class="{{ 'active' if active=='claims' }}">Claims</a>
+  <a href="{{ url_for('admin.users') }}" class="{{ 'active' if active=='users' }}">Users</a>
+  <a href="{{ url_for('admin.analytics') }}" class="{{ 'active' if active=='analytics' }}">Analytics</a>
+  <a href="{{ url_for('admin.audit_logs') }}" class="{{ 'active' if active=='audit' }}">Audit Logs</a>
+</div>

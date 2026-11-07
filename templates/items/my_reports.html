@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}My Reports — Lost and Found Application{% endblock %}
+{% block content %}
+<h1>My Reports</h1>
+
+<div class="section">
+  <div class="section-title">My Lost Item Reports</div>
+  {% if my_lost %}
+    <div class="table-wrap card">
+      <table>
+        <thead><tr><th>Item</th><th>Category</th><th>Location</th><th>Date Lost</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for item in my_lost %}
+          <tr>
+            <td><a href="{{ url_for('items.item_detail', item_type='lost', item_id=item.id) }}">{{ item.item_name }}</a></td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.city }}, {{ item.state }}</td>
+            <td>{{ item.date_lost }}</td>
+            <td><span class="tag tag-status">{{ item.status }}</span></td>
+            <td style="white-space:nowrap;">
+              <a href="{{ url_for('matches.view_matches', lost_item_id=item.id) }}" class="btn btn-outline btn-sm">Matches</a>
+              {% if item.status not in ['RETURNED','CLOSED'] %}
+                <form method="post" action="{{ url_for('items.mark_returned', item_id=item.id) }}" style="display:inline;">
+                  <button type="submit" class="btn btn-found btn-sm" onclick="return confirm('Mark this item as recovered?');">Mark Recovered</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">You haven't reported any lost items yet. <a href="{{ url_for('items.report_lost') }}">Report one now</a>.</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <div class="section-title">My Found Item Reports</div>
+  {% if my_found %}
+    <div class="table-wrap card">
+      <table>
+        <thead><tr><th>Item</th><th>Category</th><th>Location</th><th>Date Found</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for item in my_found %}
+          <tr>
+            <td><a href="{{ url_for('items.item_detail', item_type='found', item_id=item.id) }}">{{ item.item_name }}</a></td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.city }}, {{ item.state }}</td>
+            <td>{{ item.date_found }}</td>
+            <td><span class="tag tag-status">{{ item.status }}</span></td>
+            <td><a href="{{ url_for('items.item_detail', item_type='found', item_id=item.id) }}" class="btn btn-outline btn-sm">View</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">You haven't reported any found items yet. <a href="{{ url_for('items.report_found') }}">Report one now</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}
